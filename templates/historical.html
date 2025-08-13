@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Weekly To Do List</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wdth,wght@0,75..100,300..800;1,75..100,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+          rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/static/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Spinner Start -->
+<div id="spinner"
+     class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<!-- Spinner End -->
+
+<!-- Navbar & Hero Start -->
+<div class="container-fluid position-relative p-0">
+    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-1 py-lg-0">
+        <a href="{{ url_for('home') }}" class="navbar-brand p-0">
+            <h1 class="text-primary"><i class="fa-solid fa-list-check me-3"></i>To Do List</h1>
+        </a>
+        <div class="navbar-nav ms-auto py-0">
+            <a href="{{ url_for('home') }}" class="nav-item nav-link">Home</a>
+            <a href="{{ url_for('historical') }}" class="nav-item nav-link active">Historical</a>
+            <a href="{{ url_for('next_week') }}" class="nav-item nav-link">Next Week</a>
+        </div>
+    </nav>
+
+</div>
+<!-- Navbar & Hero End -->
+
+
+<!-- feature Start -->
+<div class="container-fluid feature bg-light py-5">
+  <div class="container py-5">
+
+    <div class="d-flex justify-content-end pt-3">
+      <a href="{{ url_for('export_historical_all') }}" class="btn btn-primary btn">
+        Export All
+      </a>
+    </div>
+
+    {% set ns = namespace(last=None) %}
+    {% for t in past_tasks %}
+      {% if t.week_index != ns.last %}
+
+        {# Build this week's buckets once #}
+        {% set week_tasks = past_tasks
+             | selectattr('week_index','equalto', t.week_index)
+             | list %}
+        {% set life  = week_tasks | selectattr('category','equalto','Life')  | list %}
+        {% set sport = week_tasks | selectattr('category','equalto','Sport') | list %}
+        {% set study = week_tasks | selectattr('category','equalto','Study') | list %}
+        {% set work  = week_tasks | selectattr('category','equalto','Work')  | list %}
+
+        <div class="text-center mx-auto pb-4" style="max-width:800px;">
+          <h4 class="pt-5" style="font-family:'Times New Roman',sans-serif;">
+            {{ t.week_range }}
+          </h4>
+        </div>
+
+        <div class="row g-4">
+          {# --- Life --- #}
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="feature-item feature-item-historical p-4 d-flex flex-column">
+              <div class="feature-icon mb-3"><i class="fa-solid fa-leaf fa-3x text-primary"></i></div>
+              <div class="h4 mb-3">Life</div>
+              <ul class="list-group flex-grow-1 overflow-auto mb-3">
+                {% for item in life %}
+                  <li class="list-group-item border-0 px-0 py-2">
+                    <div class="form-check d-flex justify-content-between align-items-center task-item">
+                      <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <form method="POST" action="{{ url_for('toggle_historical', task_id=item.id) }}" class="d-inline">
+                          <input class="form-check-input me-2" type="checkbox"
+                                 id="task_life{{ item.id }}"
+                                 onChange="this.form.submit()"
+                                 {% if item.done %}checked{% endif %}>
+                          <label class="form-check-label mb-0" for="task_life{{ item.id }}">
+                            {{ item.description }}
+                          </label>
+                        </form>
+                      </div>
+                      <form method="POST" action="{{ url_for('delete_historical', task_id=item.id) }}" class="d-inline">
+                        <button class="btn btn-sm">❌</button>
+                      </form>
+                    </div>
+                  </li>
+                {% else %}
+
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          {# --- Sport --- #}
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="feature-item feature-item-historical p-4">
+              <div class="feature-icon mb-3"><i class="fa-solid fa-basketball fa-3x text-primary"></i></div>
+              <div class="h4 mb-3">Sport</div>
+              <ul class="list-group flex-grow-1 overflow-auto mb-3">
+                {% for item in sport %}
+                  <li class="list-group-item border-0 px-0 py-2">
+                    <div class="form-check d-flex justify-content-between align-items-center task-item">
+                      <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <form method="POST" action="{{ url_for('toggle_historical', task_id=item.id) }}" class="d-inline">
+                          <input class="form-check-input me-2" type="checkbox"
+                                 id="task_sport{{ item.id }}"
+                                 onChange="this.form.submit()"
+                                 {% if item.done %}checked{% endif %}>
+                          <label class="form-check-label mb-0" for="task_sport{{ item.id }}">
+                            {{ item.description }}
+                          </label>
+                        </form>
+                      </div>
+                      <form method="POST" action="{{ url_for('delete_historical', task_id=item.id) }}" class="d-inline">
+                        <button class="btn btn-sm">❌</button>
+                      </form>
+                    </div>
+                  </li>
+                {% else %}
+
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          {# --- Study --- #}
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="feature-item feature-item-historical p-4">
+              <div class="feature-icon mb-3"><i class="fa-solid fa-book fa-3x text-primary"></i></div>
+              <div class="h4 mb-3">Study</div>
+              <ul class="list-group flex-grow-1 overflow-auto mb-3">
+                {% for item in study %}
+                  <li class="list-group-item border-0 px-0 py-2">
+                    <div class="form-check d-flex justify-content-between align-items-center task-item">
+                      <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <form method="POST" action="{{ url_for('toggle_historical', task_id=item.id) }}" class="d-inline">
+                          <input class="form-check-input me-2" type="checkbox"
+                                 id="task_study{{ item.id }}"
+                                 onChange="this.form.submit()"
+                                 {% if item.done %}checked{% endif %}>
+                          <label class="form-check-label mb-0" for="task_study{{ item.id }}">
+                            {{ item.description }}
+                          </label>
+                        </form>
+                      </div>
+                      <form method="POST" action="{{ url_for('delete_historical', task_id=item.id) }}" class="d-inline">
+                        <button class="btn btn-sm">❌</button>
+                      </form>
+                    </div>
+                  </li>
+                {% else %}
+
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          {# --- Work --- #}
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="feature-item feature-item-historical p-4">
+              <div class="feature-icon mb-3"><i class="fa-solid fa-briefcase fa-3x text-primary"></i></div>
+              <div class="h4 mb-3">Work</div>
+              <ul class="list-group flex-grow-1 overflow-auto mb-3">
+                {% for item in work %}
+                  <li class="list-group-item border-0 px-0 py-2">
+                    <div class="form-check d-flex justify-content-between align-items-center task-item">
+                      <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <form method="POST" action="{{ url_for('toggle_historical', task_id=item.id) }}" class="d-inline">
+                          <input class="form-check-input me-2" type="checkbox"
+                                 id="task_work{{ item.id }}"
+                                 onChange="this.form.submit()"
+                                 {% if item.done %}checked{% endif %}>
+                          <label class="form-check-label mb-0" for="task_work{{ item.id }}">
+                            {{ item.description }}
+                          </label>
+                        </form>
+                      </div>
+                      <form method="POST" action="{{ url_for('delete_historical', task_id=item.id) }}" class="d-inline">
+                        <button class="btn btn-sm">❌</button>
+                      </form>
+                    </div>
+                  </li>
+                {% else %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {% set ns.last = t.week_index %}
+      {% endif %}
+    {% endfor %}
+
+  </div>
+</div>
+
+
+<!-- feature End -->
+
+<!-- Copyright Start -->
+<div class="container-fluid copyright py-4">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6 text-center text-md-start mb-md-0">
+                <span class="text-body"><a href="#" class="border-bottom text-white"><i
+                        class="fas fa-copyright text-light me-2"></i>MX</a>, All right reserved.</span>
+            </div>
+            <div class="col-md-6 text-center text-md-end text-body">
+                <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                Designed By <a class="border-bottom text-white" href="https://htmlcodex.com">HTML Codex</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Copyright End -->
+
+
+<!-- JavaScript Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="lib/wow/wow.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/waypoints/waypoints.min.js"></script>
+<script src="lib/counterup/counterup.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+
+<!-- Template Javascript -->
+<script src="static/js/main.js"></script>
+</body>
+
+</html>
