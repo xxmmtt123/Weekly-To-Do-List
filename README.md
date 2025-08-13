@@ -21,5 +21,5 @@ Weekly To-Do List is a Flask app I built to track weekly tasks.
 <img src="./next_week.png" alt="Image Description" width="800" height="600"/>
 
 **Functionality:**  
-- Create new tasks for next week  
+- Create or delete new tasks for next week  
 
