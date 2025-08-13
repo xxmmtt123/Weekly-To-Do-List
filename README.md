@@ -7,21 +7,19 @@ Weekly To-Do List is a Flask app I built to track weekly tasks.
 **Functionality:**  
 - Add or delete items  
 - Mark tasks as done  
-- Download historical tasks  
-- Copy last week’s list with one click  
+- Copy last week’s list
 
 
 ### Historical
 <img src="./historical.png" alt="Image Description" width="800" height="600"/>
 
-Function:
+**Functionality:**  
+- View the past tasks
+- Download historical tasks  
 
+### New Task
+<img src="./next_week.png" alt="Image Description" width="800" height="600"/>
 
-
-### Select your criterias
-<img src="./images/cafe3.png" alt="Image Description" width="800" height="600"/>
-<img src="./images/cafe4.png" alt="Image Description" width="800" height="600"/>
-
-### Add a new coffee
-<img src="./images/cafe5.png" alt="Image Description" width="800" height="600"/>
+**Functionality:**  
+- Create new tasks for next week  
 
